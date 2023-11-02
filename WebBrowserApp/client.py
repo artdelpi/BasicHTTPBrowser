@@ -46,7 +46,6 @@ class WebBrowserModel:
             # Encerra conexão
             client_socket.close()
 
-            print('Conexão encerrada.')
         except socket.error:
             print('Conexão não existe ou já foi fechada.')
 
@@ -60,10 +59,10 @@ class WebBrowserModel:
             request_message (str): Solicitação HTTP do cliente.
             client_socket (socket.socket): Socket do cliente para fechar.
         Returns:
-            str: Mensagem de resposta do servidor, na forma de Página Web em string.
+            str: Corpo da mensagem de resposta do servidor, na forma de documento HTML em string.
         """
         try:
-            # Codifica solicitação HTTP em Byte Streams
+            # Codifica solicitação HTTP em Byte Stream
             request_message_encoded = request_message.encode()
 
             # Envia solicitação HTTP
@@ -72,9 +71,15 @@ class WebBrowserModel:
             # Recebe resposta HTTP
             response_message = client_socket.recv(4096)
 
-            # Decodifica resposta HTTP dada em Byte Streams
+            # Passa mensagem de Byte Stream para utf-8
             response_message_decoded = response_message.decode()
-            return response_message_decoded
+
+            # Separa o corpo do cabeçalho da resposta HTTP
+            heading, body = response_message_decoded.split('<html>')
+            body = f'<html>' + f'{body}'
+
+            # Decodifica resposta HTTP dada em Byte Streams
+            return body
         except socket.error as e:
             return ''
 
